@@ -22,16 +22,21 @@ def _update_or_create_site_with_sequence(site_model, connection, domain, name):
         # don't do anything, we'll get a unique constraint violation the next time a
         # site is created.
         # To avoid this, we need to manually update DB sequence and make sure it's
-        # greater than the maximum value.
-        max_id = site_model.objects.order_by("-id").first().id
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT last_value from django_site_id_seq")
-            (current_id,) = cursor.fetchone()
-            if current_id <= max_id:
-                cursor.execute(
-                    "alter sequence django_site_id_seq restart with %s",
-                    [max_id + 1],
-                )
+        # greater than the maximum value (PostgreSQL only; SQLite handles this automatically).
+        if connection.vendor != "sqlite":
+            max_id = site_model.objects.order_by("-id").first().id
+            with connection.cursor() as cursor:
+                try:
+                    cursor.execute("SELECT last_value from django_site_id_seq")
+                    (current_id,) = cursor.fetchone()
+                    if current_id <= max_id:
+                        cursor.execute(
+                            "alter sequence django_site_id_seq restart with %s",
+                            [max_id + 1],
+                        )
+                except Exception:
+                    # Fallback if sequence doesn't exist
+                    pass
 
 
 def update_site_forward(apps, schema_editor):

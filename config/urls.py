@@ -8,6 +8,7 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 
 from .api import api
+from .webhook_api import webhook_api
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
@@ -33,8 +34,10 @@ if settings.DEBUG:
 
 # API URLS
 urlpatterns += [
-    # API base url
+    # Authenticated API base url
     path("api/", api.urls),
+    # Public webhook endpoints (for Telegram and M-Pesa callbacks)
+    path("webhooks/", webhook_api.urls),
 ]
 
 if settings.DEBUG:

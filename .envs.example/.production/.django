@@ -1,0 +1,82 @@
+# PRODUCTION DJANGO SETTINGS
+# =====================================================================
+# Copy this to .envs/.production/.django and fill in values
+# NEVER commit this file - keep secrets secure
+
+DEBUG=False
+DJANGO_SETTINGS_MODULE=config.settings.production
+
+# Generate with: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+DJANGO_SECRET_KEY=your-super-secure-random-key-here
+
+# Allowed hosts for your domain
+DJANGO_ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com,api.yourdomain.com,*.yourdomain.com
+
+# Admin URL (change from /admin/ to something obscure)
+DJANGO_ADMIN_URL=secure-admin-path/
+
+# Database (PostgreSQL)
+# Example: postgresql://user:password@db.example.com:5432/m_pesa_telegram_bot
+DATABASE_URL=postgresql://dbuser:dbpassword@postgres-instance.example.com:5432/m_pesa_telegram_bot
+
+# Redis (Celery + Cache)
+# Example: redis://user:password@redis.example.com:6379/1
+REDIS_URL=redis://:redispassword@redis-instance.example.com:6379/1
+REDIS_SSL=True
+
+# Email Configuration (SendGrid, Mailgun, etc.)
+DJANGO_EMAIL_BACKEND=anymail.backends.sendgrid.EmailBackend
+SENDGRID_API_KEY=your-sendgrid-api-key
+
+# Alternative: Mailgun
+# DJANGO_EMAIL_BACKEND=anymail.backends.mailgun.EmailBackend
+# MAILGUN_API_KEY=your-mailgun-api-key
+# MAILGUN_SENDER_DOMAIN=mail.yourdomain.com
+
+# Sentry (Error Tracking & Monitoring)
+SENTRY_DSN=https://yourkey@sentry.io/1234567
+
+# M-Pesa Daraja (Production Credentials)
+# Get from Safaricom Developer Portal - Production Environment
+MPESA_CONSUMER_KEY=your-production-daraja-key
+MPESA_CONSUMER_SECRET=your-production-daraja-secret
+MPESA_ENVIRONMENT=production
+
+# Security - HTTPS Enforcement
+SECURE_SSL_REDIRECT=True
+SECURE_HSTS_SECONDS=31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+SECURE_HSTS_PRELOAD=True
+SESSION_COOKIE_SECURE=True
+CSRF_COOKIE_SECURE=True
+SECURE_PROXY_SSL_HEADER=HTTP_X_FORWARDED_PROTO,https
+
+# Security - Content Security Policy (Optional but recommended)
+# CSP_DEFAULT_SRC=('self',)
+
+# CORS Settings (Only allow your frontend/admin domains)
+CORS_ALLOWED_ORIGINS=https://yourdomain.com,https://admin.yourdomain.com
+
+# AWS S3 (For media uploads in production)
+USE_S3=True
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_STORAGE_BUCKET_NAME=m-pesa-bot-media
+AWS_S3_REGION_NAME=us-east-1
+AWS_S3_CUSTOM_DOMAIN=cdn.yourdomain.com
+
+# Read .env file
+DJANGO_READ_DOT_ENV_FILE=False
+
+# Logging
+# Optional: Set log level for various modules
+# DJANGO_LOG_LEVEL=INFO
+# CELERY_LOG_LEVEL=INFO
+
+# Timezone (Nairobi for M-Pesa)
+# This is set in settings/base.py but can be overridden here if needed
+# TIME_ZONE=Africa/Nairobi
+
+# New Relic (Optional alternative to Sentry)
+# NEW_RELIC_CONFIG_FILE=newrelic.ini
+# NEW_RELIC_ENVIRONMENT=production

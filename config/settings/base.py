@@ -11,10 +11,11 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "m_pesa_telegram_bot"
 env = environ.Env()
 
-READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
-if READ_DOT_ENV_FILE:
-    # OS environment variables take precedence over variables from .env
-    env.read_env(str(BASE_DIR / ".env"))
+# Automatically read .env if it exists (for local development)
+# OS environment variables take precedence over variables from .env
+env_file = BASE_DIR / ".env"
+if env_file.exists():
+    env.read_env(str(env_file))
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -46,7 +47,9 @@ LOCALE_PATHS = [str(BASE_DIR / "locale")]
 # DATABASES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
+# Support both Docker (PostgreSQL) and local development (SQLite)
 DATABASES = {"default": env.db("DATABASE_URL")}
+
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -84,6 +87,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "m_pesa_telegram_bot.users",
+    "m_pesa_telegram_bot.contrib",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -260,7 +264,7 @@ LOGGING = {
     "root": {"level": "INFO", "handlers": ["console"]},
 }
 
-REDIS_URL = env("REDIS_URL", default="redis://redis:6379/0")
+REDIS_URL = env("REDIS_URL")
 REDIS_SSL = REDIS_URL.startswith("rediss://")
 
 # Celery
@@ -269,11 +273,11 @@ if USE_TZ:
     # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-timezone
     CELERY_TIMEZONE = TIME_ZONE
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-broker_url
-CELERY_BROKER_URL = REDIS_URL
+CELERY_BROKER_URL = f"{REDIS_URL}/1" # default Redis DB 1 for Celery broker
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#redis-backend-use-ssl
 CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE} if REDIS_SSL else None
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-result_backend
-CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_RESULT_BACKEND = f"{REDIS_URL}/2" # default Redis DB 2 for Celery results
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#redis-backend-use-ssl
 CELERY_REDIS_BACKEND_USE_SSL = CELERY_BROKER_USE_SSL
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-extended
@@ -303,6 +307,29 @@ CELERY_WORKER_SEND_TASK_EVENTS = True
 CELERY_TASK_SEND_SENT_EVENT = True
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#worker-hijack-root-logger
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+
+# Celery Beat Schedule - Scheduled periodic tasks
+# https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html#entries
+from celery.schedules import crontab  # noqa: E402
+
+CELERY_BEAT_SCHEDULE = {
+    # Check subscription expiry daily at 2 AM
+    "check_subscription_expiry_daily": {
+        "task": "m_pesa_telegram_bot.contrib.tasks.check_subscription_expiry",
+        "schedule": crontab(hour=2, minute=0),
+    },
+    # Retry failed telegram invites every hour
+    "retry_failed_invites_hourly": {
+        "task": "m_pesa_telegram_bot.contrib.tasks.retry_failed_invites",
+        "schedule": crontab(minute=0),  # Top of every hour
+    },
+    # Clean up expired payments weekly on Sunday 3 AM
+    "cleanup_expired_payments_weekly": {
+        "task": "m_pesa_telegram_bot.contrib.tasks.cleanup_expired_payments",
+        "schedule": crontab(day_of_week=0, hour=3, minute=0),
+    },
+}
+
 # django-allauth
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)

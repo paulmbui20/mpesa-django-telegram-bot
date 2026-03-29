@@ -1,0 +1,51 @@
+# LOCAL DJANGO SETTINGS
+# =====================================================================
+# Copy this to .envs/.local/.django and fill in values
+
+DEBUG=True
+DJANGO_SETTINGS_MODULE=config.settings.local
+DJANGO_SECRET_KEY=your-insecure-secret-key-change-this
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,.local
+
+# Database
+DATABASE_URL=postgresql://postgres:postgres@postgres:5432/m_pesa_telegram_bot_local
+
+# Redis (Celery Broker & Cache)
+REDIS_URL=redis://redis:6379/0
+REDIS_SSL=False
+
+# Email Configuration (Local Development - Uses Mailpit)
+DJANGO_EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=mailpit
+EMAIL_PORT=1025
+EMAIL_USE_TLS=False
+
+# Sentry (Error Tracking) - Optional for local
+SENTRY_DSN=
+
+# M-Pesa Daraja (Get from Safaricom Developer Portal)
+# Use Sandbox credentials for local development
+MPESA_CONSUMER_KEY=your-daraja-sandbox-key
+MPESA_CONSUMER_SECRET=your-daraja-sandbox-secret
+MPESA_ENVIRONMENT=sandbox
+
+# Read .env file
+DJANGO_READ_DOT_ENV_FILE=False
+
+# Security
+SECURE_SSL_REDIRECT=False
+SESSION_COOKIE_SECURE=False
+CSRF_COOKIE_SECURE=False
+
+# CORS (Local development - allow all)
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8000
+
+# AWS (Optional - for media uploads)
+# AWS_ACCESS_KEY_ID=
+# AWS_SECRET_ACCESS_KEY=
+# AWS_STORAGE_BUCKET_NAME=
+# AWS_S3_REGION_NAME=us-east-1
+
+# Telegram Bot Token (Set per-business in admin panel)
+# Or use environment variable if needed
+# TELEGRAM_BOT_TOKEN=your-telegram-bot-token
