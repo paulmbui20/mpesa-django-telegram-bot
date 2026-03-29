@@ -32,6 +32,7 @@ class BusinessAdmin(admin.ModelAdmin):
     ]
     list_filter = ["is_active", "is_verified", "created"]
     search_fields = ["name", "slug", "owner__email", "mpesa_till_number"]
+    prepopulated_fields = {"slug": ("name",)}
     readonly_fields = [
         "webhook_secret",
         "created",

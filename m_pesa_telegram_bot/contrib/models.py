@@ -5,7 +5,7 @@ Implements row-level multi-tenancy using Foreign Keys.
 
 from datetime import timedelta
 from typing import ClassVar
-
+from django.utils.text import slugify
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -22,7 +22,7 @@ class Business(TimeStampedModel):
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="businesses")
     name = models.CharField(_("Business Name"), max_length=255)
-    slug = models.SlugField(unique=True, max_length=255)
+    slug = models.SlugField(unique=True, max_length=255, null=True, blank=True)
 
     # M-Pesa Credentials (Daraja)
     mpesa_consumer_key = models.CharField(_("M-Pesa API Key"), max_length=255)
@@ -80,6 +80,24 @@ class Business(TimeStampedModel):
 
     def get_absolute_url(self) -> str:
         return f"/dashboard/{self.slug}/"
+
+    def save(self, *args, **kwargs) -> None:
+        """Override save to auto-generate slug and webhook secret."""
+        if not self.slug:
+            base_slug = slugify(self.name)  # Ensure slug fits max_length
+            slug = base_slug
+            counter = 1
+            while Business.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+
+        if not self.webhook_secret:
+            import secrets
+
+            self.webhook_secret = secrets.token_urlsafe(32)
+
+        super().save(*args, **kwargs)
 
 
 class TelegramChannel(TimeStampedModel):
