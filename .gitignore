@@ -68,6 +68,7 @@ venv/
 ENV/
 env/
 
+copilot/
 
 # Rope project settings
 .ropeproject
