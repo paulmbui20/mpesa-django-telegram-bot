@@ -40,8 +40,8 @@ django-extensions==4.1
 django-model-utils==5.0.0
 django-ninja==1.6.2
 django-redis==6.0.0
-django-stubs==6.0.1
-django-stubs-ext==6.0.1
+django-stubs==6.0.2
+django-stubs-ext==6.0.2
 django-timezone-field==7.2.1
 djlint==1.36.4
 dnspython==2.8.0
@@ -50,7 +50,7 @@ editorconfig==0.17.1
 email-validator==2.3.0
 executing==2.2.1
 factory-boy==3.3.3
-faker==40.11.1
+faker==40.12.0
 fido2==2.1.1
 filelock==3.25.2
 flower==2.0.1
@@ -77,7 +77,7 @@ librt==0.8.1
 markupsafe==3.0.3
 matplotlib-inline==0.2.1
 mpesakit==2.1.0
-mypy==1.19.1
+mypy==1.20.0
 mypy-extensions==1.1.0
 nodeenv==1.10.0
 packaging==26.0
@@ -96,8 +96,8 @@ ptyprocess==0.7.0
 pure-eval==0.2.3
 pycparser==3.0
 pydantic==2.12.5
-pydantic-core==2.41.5
-pygments==2.19.2
+pydantic-core==2.45.0
+pygments==2.20.0
 pytest==9.0.2
 pytest-django==4.12.0
 pytest-sugar==1.1.1
@@ -112,11 +112,11 @@ qrcode==8.2
 rcssmin==1.2.2
 redis==7.4.0
 regex==2026.3.32
-requests==2.33.0
+requests==2.33.1
 rjsmin==1.2.5
 roman-numerals==4.1.0
 ruff==0.15.8
-sentry-sdk==2.56.0
+sentry-sdk==2.57.0
 six==1.17.0
 snowballstemmer==3.0.1
 sphinx==9.1.0
